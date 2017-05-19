@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Controller\AppController;
 use Cake\Network\Http\Client;
+use Cake\Event\Event;
 
 /**
  * Movies Controller
@@ -16,9 +17,17 @@ class MoviesController extends AppController
     public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['add', 'getMovieByImdbid']);
+        $this->Auth->allow(['add', 'getMovieByImdbid', 'search']);
 
         $this->loadComponent('RequestHandler');
+        $this->loadComponent('Security');
+    }
+
+    public function beforeFilter(Event $event)
+    {
+        if (in_array($this->request->action, ['add', 'getMovieByImdbid', 'search'])) {
+            $this->response->header('Access-Control-Allow-Origin', '*');
+        }
     }
 
     /**
@@ -132,7 +141,7 @@ class MoviesController extends AppController
         $this->set('_serialize', ['movie']);
     }
 
-    public function searchByTitleOmdb($title)
+    public function searchByTitleOmdb($title = '')
     {
         $movies = [];
         $http = new Client();
@@ -151,7 +160,7 @@ class MoviesController extends AppController
         }
     }
 
-    public function search($title)
+    public function search($title = '')
     {
         $movies = $this->searchByTitleOmdb($title);
 
