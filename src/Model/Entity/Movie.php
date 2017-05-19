@@ -7,8 +7,14 @@ use Cake\ORM\Entity;
  * Movie Entity
  *
  * @property int $id
+ * @property string $title
+ * @property string $year
  * @property string $imdbid
- * @property string $name
+ * @property string $type
+ * @property string $director
+ * @property string $poster
+ * @property string $genre
+ * @property string $plot
  */
 class Movie extends Entity
 {

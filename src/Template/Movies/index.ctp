@@ -15,8 +15,14 @@
         <thead>
             <tr>
                 <th scope="col"><?= $this->Paginator->sort('id') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('title') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('year') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('imdbid') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('name') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('type') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('director') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('poster') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('genre') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('plot') ?></th>
                 <th scope="col" class="actions"><?= __('Actions') ?></th>
             </tr>
         </thead>
@@ -24,8 +30,14 @@
             <?php foreach ($movies as $movie): ?>
             <tr>
                 <td><?= $this->Number->format($movie->id) ?></td>
+                <td><?= h($movie->title) ?></td>
+                <td><?= h($movie->year) ?></td>
                 <td><?= h($movie->imdbid) ?></td>
-                <td><?= h($movie->name) ?></td>
+                <td><?= h($movie->type) ?></td>
+                <td><?= h($movie->director) ?></td>
+                <td><?= h($movie->poster) ?></td>
+                <td><?= h($movie->genre) ?></td>
+                <td><?= h($movie->plot) ?></td>
                 <td class="actions">
                     <?= $this->Html->link(__('View'), ['action' => 'view', $movie->id]) ?>
                     <?= $this->Html->link(__('Edit'), ['action' => 'edit', $movie->id]) ?>

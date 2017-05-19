@@ -16,12 +16,36 @@
     <h3><?= h($movie->name) ?></h3>
     <table class="vertical-table">
         <tr>
+            <th scope="row"><?= __('Title') ?></th>
+            <td><?= h($movie->title) ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Year') ?></th>
+            <td><?= h($movie->year) ?></td>
+        </tr>
+        <tr>
             <th scope="row"><?= __('Imdbid') ?></th>
             <td><?= h($movie->imdbid) ?></td>
         </tr>
         <tr>
-            <th scope="row"><?= __('Name') ?></th>
-            <td><?= h($movie->name) ?></td>
+            <th scope="row"><?= __('Type') ?></th>
+            <td><?= h($movie->type) ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Director') ?></th>
+            <td><?= h($movie->director) ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Poster') ?></th>
+            <td><?= h($movie->poster) ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Genre') ?></th>
+            <td><?= h($movie->genre) ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Plot') ?></th>
+            <td><?= h($movie->plot) ?></td>
         </tr>
         <tr>
             <th scope="row"><?= __('Id') ?></th>

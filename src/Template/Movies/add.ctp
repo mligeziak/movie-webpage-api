@@ -14,8 +14,14 @@
     <fieldset>
         <legend><?= __('Add Movie') ?></legend>
         <?php
+            echo $this->Form->control('title');
+            echo $this->Form->control('year');
             echo $this->Form->control('imdbid');
-            echo $this->Form->control('name');
+            echo $this->Form->control('type');
+            echo $this->Form->control('director');
+            echo $this->Form->control('poster');
+            echo $this->Form->control('genre');
+            echo $this->Form->control('plot');
         ?>
     </fieldset>
     <?= $this->Form->button(__('Submit')) ?>

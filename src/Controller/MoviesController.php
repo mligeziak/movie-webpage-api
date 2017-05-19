@@ -125,10 +125,37 @@ class MoviesController extends AppController
 
         if($response->isOk()) {
             $movieJson = $response->body;
-            $movie = json_decode($movieJson);
+            $movie = json_decode($movieJson, true);
         }
 
         $this->set('movie', $movie);
         $this->set('_serialize', ['movie']);
+    }
+
+    public function searchByTitleOmdb($title)
+    {
+        $movies = [];
+        $http = new Client();
+        $response = $http->get('http://www.omdbapi.com/?s=' . $title);
+
+        if($response->isOk()) {
+            $moviesJson = $response->body;
+            $movies = json_decode($moviesJson, true);
+        }
+
+        if(isset($movies['Response']) && $movies['Response'] == 'True') {
+            return $movies['Search'];
+        }
+        else {
+            return [];
+        }
+    }
+
+    public function search($title)
+    {
+        $movies = $this->searchByTitleOmdb($title);
+
+        $this->set('movies', $movies);
+        $this->set('_serialize', ['movies']);
     }
 }
