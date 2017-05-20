@@ -16,12 +16,12 @@ class AppusersController extends AppController
     public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['register']);
+        $this->Auth->allow(['signup']);
     }
 
     public function beforeFilter(Event $event)
     {
-        if (in_array($this->request->action, ['register'])) {
+        if (in_array($this->request->action, ['signup'])) {
             $this->response->header('Access-Control-Allow-Origin', '*');
         }
     }
@@ -120,5 +120,23 @@ class AppusersController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function signup()
+    {
+        $appuser = $this->Appusers->newEntity();
+        //if ($this->request->is('post')) {
+            var_dump($this->request->getData());
+            die();
+            $appuser = $this->Appusers->patchEntity($appuser, $this->request->getData());
+            if ($this->Appusers->save($appuser)) {
+                $this->Flash->success(__('The appuser has been saved.'));
+
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('The appuser could not be saved. Please, try again.'));
+        //}
+        $this->set(compact('appuser'));
+        $this->set('_serialize', ['appuser']);
     }
 }
