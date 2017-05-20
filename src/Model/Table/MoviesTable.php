@@ -52,32 +52,26 @@ class MoviesTable extends Table
             ->notEmpty('title');
 
         $validator
-            ->requirePresence('year', 'create')
-            ->notEmpty('year');
+            ->allowEmpty('year');
 
         $validator
             ->requirePresence('imdbid', 'create')
             ->notEmpty('imdbid');
 
         $validator
-            ->requirePresence('type', 'create')
-            ->notEmpty('type');
+            ->allowEmpty('type');
 
         $validator
-            ->requirePresence('director', 'create')
-            ->notEmpty('director');
+            ->allowEmpty('director');
 
         $validator
-            ->requirePresence('poster', 'create')
-            ->notEmpty('poster');
+            ->allowEmpty('poster');
 
         $validator
-            ->requirePresence('genre', 'create')
-            ->notEmpty('genre');
+            ->allowEmpty('genre');
 
         $validator
-            ->requirePresence('plot', 'create')
-            ->notEmpty('plot');
+            ->allowEmpty('plot');
 
         return $validator;
     }
