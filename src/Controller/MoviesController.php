@@ -5,6 +5,7 @@ use App\Controller\AppController;
 use Cake\Network\Http\Client;
 use Cake\Event\Event;
 use App\Model\Entity\Movie;
+use Cake\Core\Configure;
 
 /**
  * Movies Controller
@@ -131,7 +132,7 @@ class MoviesController extends AppController
     {
         $movie = '';
         $http = new Client();
-        $response = $http->get('http://www.omdbapi.com/?i=' . $imdbid);
+        $response = $http->get('http://www.omdbapi.com/?i=' . $imdbid . '&apikey=' . Configure::read('API_KEY'));
 
         if($response->isOk()) {
             $movieJson = $response->body;
@@ -163,7 +164,7 @@ class MoviesController extends AppController
         $omdbMovies = [];
         $item = [];
         $http = new Client();
-        $response = $http->get('http://www.omdbapi.com/?s=' . $title);
+        $response = $http->get('http://www.omdbapi.com/?s=' . $title . '&apikey=' . Configure::read('API_KEY'));
 
         if($response->isOk()) {
             $moviesJson = $response->body;
