@@ -225,10 +225,14 @@ class MoviesController extends AppController
     {
         $this->addToCacheIfNotExistFromOmdb($title);
 
-        $movies = $this->Movies->find('all', [
-            'conditions' => ['Movies.title LIKE' => "%$title%"],
-            'limit' => 10
-        ]);
+        $movies = [];
+
+        if($title != '') {
+            $movies = $this->Movies->find('all', [
+                'conditions' => ['Movies.title LIKE' => "%$title%"],
+                'limit' => 10
+            ]);
+        }
 
         $this->set('movies', $movies);
         $this->set('_serialize', ['movies']);
