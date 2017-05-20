@@ -20,9 +20,6 @@ class MoviesController extends AppController
     {
         parent::initialize();
         $this->Auth->allow(['getMovieByImdbid', 'search']);
-
-        $this->loadComponent('RequestHandler');
-        $this->loadComponent('Security');
     }
 
     public function beforeFilter(Event $event)
