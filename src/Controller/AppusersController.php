@@ -125,18 +125,14 @@ class AppusersController extends AppController
     public function signup()
     {
         $appuser = $this->Appusers->newEntity();
-        //if ($this->request->is('post')) {
-            var_dump($this->request->getData());
-            die();
+        $saved = false;
+        if ($this->request->is('post')) {
             $appuser = $this->Appusers->patchEntity($appuser, $this->request->getData());
             if ($this->Appusers->save($appuser)) {
-                $this->Flash->success(__('The appuser has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
+                $saved = true;
             }
-            $this->Flash->error(__('The appuser could not be saved. Please, try again.'));
-        //}
-        $this->set(compact('appuser'));
-        $this->set('_serialize', ['appuser']);
+        }
+        $this->set(compact('saved'));
+        $this->set('_serialize', ['saved']);
     }
 }
