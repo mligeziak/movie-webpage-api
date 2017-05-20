@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\Network\Http\Client;
 use Cake\Event\Event;
+use App\Model\Entity\Movie;
 
 /**
  * Movies Controller
@@ -17,7 +18,7 @@ class MoviesController extends AppController
     public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['add', 'getMovieByImdbid', 'search']);
+        $this->Auth->allow(['getMovieByImdbid', 'search']);
 
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Security');
@@ -25,7 +26,7 @@ class MoviesController extends AppController
 
     public function beforeFilter(Event $event)
     {
-        if (in_array($this->request->action, ['add', 'getMovieByImdbid', 'search'])) {
+        if (in_array($this->request->action, ['getMovieByImdbid', 'search'])) {
             $this->response->header('Access-Control-Allow-Origin', '*');
         }
     }
@@ -141,19 +142,53 @@ class MoviesController extends AppController
         $this->set('_serialize', ['movie']);
     }
 
+    public function addToDatabaseCache($data) {
+        $movie = new Movie;
+        $movie->set($data);
+        $this->Movies->save($movie);
+    }
+
+    public function removeNAFromArray($array) {
+        foreach($array as $key => $value) {
+            if($value == 'N/A') {
+                $array[$key] = '';
+            }
+        }
+
+        return $array;
+    }
+
     public function searchByTitleOmdb($title = '')
     {
-        $movies = [];
+        $omdbMovies = [];
+        $item = [];
         $http = new Client();
         $response = $http->get('http://www.omdbapi.com/?s=' . $title);
 
         if($response->isOk()) {
             $moviesJson = $response->body;
-            $movies = json_decode($moviesJson, true);
+            $omdbMovies = json_decode($moviesJson, true);
         }
 
-        if(isset($movies['Response']) && $movies['Response'] == 'True') {
-            return $movies['Search'];
+        if(isset($omdbMovies['Response']) && $omdbMovies['Response'] == 'True') {
+            $omdbMovies = $omdbMovies['Search'];
+            foreach($omdbMovies as $omdbMovie) {
+                $omdbMovie = $this->removeNAFromArray($omdbMovie);
+                
+                $item['title'] = $omdbMovie['Title'];
+                $item['year'] = $omdbMovie['Year'];
+                $item['imdbid'] = $omdbMovie['imdbID'];
+                $item['type'] = $omdbMovie['Type'];
+                $item['director'] = '';
+                $item['poster'] = $omdbMovie['Poster'];
+                $item['genre'] = '';
+                $item['plot'] = '';
+
+                //$this->addToDatabaseCache($item);
+
+                $movies[] = $item;
+            }
+            return $movies;
         }
         else {
             return [];
