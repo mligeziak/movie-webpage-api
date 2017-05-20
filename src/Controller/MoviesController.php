@@ -143,13 +143,15 @@ class MoviesController extends AppController
         $this->set('_serialize', ['movie']);
     }
 
-    public function addToDatabaseCache($data) {
+    public function addToDatabaseCache($data)
+    {
         $movie = new Movie;
         $movie->set($data);
         $this->Movies->save($movie);
     }
 
-    public function removeNAFromArray($array) {
+    public function removeNAFromArray($array)
+    {
         foreach($array as $key => $value) {
             if($value == 'N/A') {
                 $array[$key] = '';
@@ -157,6 +159,17 @@ class MoviesController extends AppController
         }
 
         return $array;
+    }
+
+    public function isInCache($movie)
+    {
+        $result = $this->Movies->find('all', [
+            'conditions' => ['Movies.imdbid' => $movie['imdbid']]
+        ]);
+
+        $count = $result->count();
+
+        return ($count >= 1);
     }
 
     public function searchByTitleOmdb($title = '')
@@ -185,10 +198,13 @@ class MoviesController extends AppController
                 $item['genre'] = '';
                 $item['plot'] = '';
 
-                //$this->addToDatabaseCache($item);
+                if(!$this->isInCache($item)) {
+                    $this->addToDatabaseCache($item);
+                }
 
                 $movies[] = $item;
             }
+            
             return $movies;
         }
         else {
