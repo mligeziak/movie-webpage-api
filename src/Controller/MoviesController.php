@@ -221,15 +221,21 @@ class MoviesController extends AppController
         }
     }
 
-    public function search($title = '')
+    public function search($query = '')
     {
-        $this->addToCacheIfNotExistFromOmdb($title);
+        $this->addToCacheIfNotExistFromOmdb($query);
 
         $movies = [];
 
-        if($title != '') {
+        if($query != '') {
             $movies = $this->Movies->find('all', [
-                'conditions' => ['Movies.title LIKE' => "%$title%"],
+                'conditions' => [
+                    'OR' => [
+                        'Movies.title LIKE' => "%$query%",
+                        'Movies.genre LIKE' => "%$query%",
+                        'Movies.director LIKE' => "%$query%"
+                    ]
+                ],
                 'limit' => 10
             ]);
         }
