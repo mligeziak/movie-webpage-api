@@ -128,7 +128,7 @@ class MoviesController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
-    public function getMovieByImdbid($imdbid = null)
+    public function getMovieByImdbid($imdbid = null, $isFromRequest = true)
     {
         $movie = '';
         $http = new Client();
@@ -139,12 +139,21 @@ class MoviesController extends AppController
             $movie = json_decode($movieJson, true);
         }
 
-        $this->set('movie', $movie);
-        $this->set('_serialize', ['movie']);
+        if($isFromRequest) {
+            $this->set('movie', $movie);
+            $this->set('_serialize', ['movie']);
+        }
+        else {
+            return $movie;
+        }
     }
 
     public function addToDatabaseCache($data)
     {
+        $fullMovieData = $this->getMovieByImdbid($data['imdbid'], false);
+        $data['director'] = $fullMovieData['Director'];
+        $data['genre'] = $fullMovieData['Genre'];
+        $data['plot'] = $fullMovieData['Plot'];
         $movie = new Movie;
         $movie->set($data);
         $this->Movies->save($movie);
@@ -172,7 +181,7 @@ class MoviesController extends AppController
         return ($count >= 1);
     }
 
-    public function searchByTitleOmdb($title = '')
+    public function addToCacheIfNotExistFromOmdb($title = '')
     {
         $omdbMovies = [];
         $item = [];
@@ -214,7 +223,12 @@ class MoviesController extends AppController
 
     public function search($title = '')
     {
-        $movies = $this->searchByTitleOmdb($title);
+        $this->addToCacheIfNotExistFromOmdb($title);
+
+        $movies = $this->Movies->find('all', [
+            'conditions' => ['Movies.title LIKE' => "%$title%"],
+            'limit' => 10
+        ]);
 
         $this->set('movies', $movies);
         $this->set('_serialize', ['movies']);
