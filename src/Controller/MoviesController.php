@@ -25,7 +25,10 @@ class MoviesController extends AppController
     public function beforeFilter(Event $event)
     {
         if (in_array($this->request->action, ['getMovieByImdbid', 'search'])) {
-            $this->response->header('Access-Control-Allow-Origin', '*');
+            $this->response->header('Access-Control-Allow-Origin', Configure::read('APP_ORIGIN'));
+            $this->response->header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+            $this->response->header('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
+            $this->response->header('Access-Control-Allow-Credentials', 'true');
         }
     }
 

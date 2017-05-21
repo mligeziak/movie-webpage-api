@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\Event\Event;
 use Cake\Auth\DefaultPasswordHasher;
+use Cake\Core\Configure;
 
 /**
  * Appusers Controller
@@ -25,15 +26,14 @@ class AppusersController extends AppController
     public function beforeFilter(Event $event)
     {
         if (in_array($this->request->action, ['signup', 'login'])) {
-            $this->response->header('Access-Control-Allow-Origin', '*');
+            $this->response->header('Access-Control-Allow-Origin', Configure::read('APP_ORIGIN'));
             $this->response->header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
             $this->response->header('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
             $this->response->header('Access-Control-Allow-Credentials', 'true');
         }
         $this->Cookie->config([
             'expires' => '+2 days',
-            'path' => '/',
-            'domain' => '.ct8.pl'
+            'path' => '/'
         ]);
     }
 
@@ -155,17 +155,17 @@ class AppusersController extends AppController
         if ($this->request->is('post')) {
             $data = $this->request->getData();
             $user = $this->Appusers->find('all', [
-                'fields' => ['email', 'password'],
+                'fields' => ['id', 'email', 'password'],
                 'conditions' => ['Appusers.email' => $data['email']],
             ])->toArray();
             if(count($user) > 0) {
                 $user = $user[0];
                 if($hasher->check($data['password'], $user['password'])) {
                     $loggedin = true;
+                    $this->Cookie->write('Appuser.verificationCode', $user['id']);
                 }
             }
         }
-        $this->Cookie->write('Appuser.verificationCode', '23123');
         $verificationCode =  $this->Cookie->read('Appuser.verificationCode');
         $this->set(compact('loggedin', 'verificationCode'));
         $this->set('_serialize', ['loggedin', 'verificationCode']);
