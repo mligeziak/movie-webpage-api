@@ -20,12 +20,12 @@ class AppusersController extends AppController
     public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['signup', 'login', 'getAccountData']);
+        $this->Auth->allow(['signup', 'login', 'getAccountData', 'addToFavorites', 'getMyFavorites']);
     }
 
     public function beforeFilter(Event $event)
     {
-        if (in_array($this->request->action, ['signup', 'login', 'getAccountData'])) {
+        if (in_array($this->request->action, ['signup', 'login', 'getAccountData', 'addToFavorites', 'getMyFavorites'])) {
             $this->response->header('Access-Control-Allow-Origin', Configure::read('APP_ORIGIN'));
             $this->response->header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
             $this->response->header('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
@@ -178,5 +178,60 @@ class AppusersController extends AppController
 
         $this->set('appuser', $appuser);
         $this->set('_serialize', ['appuser']);
+    }
+
+    public function addToFavorites($imdbid)
+    {
+        $saved = false;
+
+        $data['appuser_id'] = $this->Cookie->read('Appuser.verificationCode');
+        $data['imdbid'] = $imdbid;
+
+        $this->loadmodel("Favorites");
+
+        $favorite = $this->Favorites->newEntity();
+        $favorite = $this->Favorites->patchEntity($favorite, $data);
+        if($this->Favorites->save($favorite)) {
+            $saved = true;
+        }
+
+        $this->set('saved', $saved);
+        $this->set('_serialize', ['saved']);
+    }
+
+    public function getMyFavorites()
+    {
+        $id =  $this->Cookie->read('Appuser.verificationCode');
+        $favorites = [];
+        $this->loadmodel("Favorites");
+
+        $results = $this->Favorites->find('all', [
+            'conditions' => ['Favorites.appuser_id' => $id],
+            'fields' => [
+                'Movies.id',
+                'Movies.title',
+                'Movies.year',
+                'Movies.imdbid',
+                'Movies.type',
+                'Movies.director',
+                'Movies.poster',
+                'Movies.genre',
+                'Movies.plot'
+            ]
+        ])
+        ->hydrate(false)
+        ->join([
+            'table' => 'movies',
+            'alias' => 'Movies',
+            'type' => 'INNER',
+            'conditions' => 'Movies.imdbid = favorites.imdbid',
+        ])->toArray();
+
+        foreach($results as $item) {
+            $favorites[] = $item['Movies'];
+        }
+
+        $this->set('favorites', $favorites);
+        $this->set('_serialize', ['favorites']);
     }
 }
