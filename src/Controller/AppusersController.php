@@ -224,7 +224,7 @@ class AppusersController extends AppController
             'table' => 'movies',
             'alias' => 'Movies',
             'type' => 'INNER',
-            'conditions' => 'Movies.imdbid = favorites.imdbid',
+            'conditions' => 'Movies.imdbid = Favorites.imdbid',
         ])->toArray();
 
         foreach($results as $item) {
