@@ -20,12 +20,12 @@ class AppusersController extends AppController
     public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['signup', 'login', 'getAccountData', 'addToFavorites', 'getMyFavorites']);
+        $this->Auth->allow(['signup', 'login', 'getAccountData', 'addToFavorites', 'getMyFavorites', 'addMovieRating', 'getMovieRating']);
     }
 
     public function beforeFilter(Event $event)
     {
-        if (in_array($this->request->action, ['signup', 'login', 'getAccountData', 'addToFavorites', 'getMyFavorites'])) {
+        if (in_array($this->request->action, ['signup', 'login', 'getAccountData', 'addToFavorites', 'getMyFavorites', 'addMovieRating', 'getMovieRating'])) {
             $this->response->header('Access-Control-Allow-Origin', Configure::read('APP_ORIGIN'));
             $this->response->header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
             $this->response->header('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
@@ -233,5 +233,41 @@ class AppusersController extends AppController
 
         $this->set('favorites', $favorites);
         $this->set('_serialize', ['favorites']);
+    }
+
+    public function addMovieRating($imdbid, $rating)
+    {
+        $saved = false;
+
+        $data['rating'] = $rating;
+        $data['imdbid'] = $imdbid;
+
+        $this->loadmodel("Ratings");
+
+        $newRating = $this->Ratings->newEntity();
+        $newRating = $this->Ratings->patchEntity($newRating, $data);
+        if($this->Ratings->save($newRating)) {
+            $saved = true;
+        }
+
+        $this->set('saved', $saved);
+        $this->set('_serialize', ['saved']);
+    }
+
+    public function getMovieRating($imdbid)
+    {
+        $this->loadmodel("Ratings");
+
+        $rating = $this->Ratings->find('all', [
+            'conditions' => ['Ratings.imdbid' => $imdbid]
+        ]);
+        $rating = $rating->select(['avg' => $rating->func()->avg('rating')])->toArray();
+
+        if($rating[0]['avg'] == null) {
+            $rating[0]['avg'] = 'no votes';
+        }
+
+        $this->set('rating', $rating);
+        $this->set('_serialize', ['rating']);
     }
 }
