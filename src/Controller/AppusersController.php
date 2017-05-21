@@ -14,6 +14,8 @@ use Cake\Auth\DefaultPasswordHasher;
  */
 class AppusersController extends AppController
 {
+    public $components = ['Cookie'];
+
     public function initialize()
     {
         parent::initialize();
@@ -26,7 +28,13 @@ class AppusersController extends AppController
             $this->response->header('Access-Control-Allow-Origin', '*');
             $this->response->header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
             $this->response->header('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
+            $this->response->header('Access-Control-Allow-Credentials', 'true');
         }
+        $this->Cookie->config([
+            'expires' => '+2 days',
+            'path' => '/',
+            'domain' => '.ct8.pl'
+        ]);
     }
 
     /**
@@ -143,6 +151,7 @@ class AppusersController extends AppController
     {
         $hasher = new DefaultPasswordHasher();
         $loggedin = false;
+        $verificationCode = '';
         if ($this->request->is('post')) {
             $data = $this->request->getData();
             $user = $this->Appusers->find('all', [
@@ -156,7 +165,9 @@ class AppusersController extends AppController
                 }
             }
         }
-        $this->set(compact('loggedin'));
-        $this->set('_serialize', ['loggedin']);
+        $this->Cookie->write('Appuser.verificationCode', '23123');
+        $verificationCode =  $this->Cookie->read('Appuser.verificationCode');
+        $this->set(compact('loggedin', 'verificationCode'));
+        $this->set('_serialize', ['loggedin', 'verificationCode']);
     }
 }
