@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Controller\AppController;
 use Cake\Event\Event;
+use Cake\Auth\DefaultPasswordHasher;
 
 /**
  * Appusers Controller
@@ -16,12 +17,12 @@ class AppusersController extends AppController
     public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['signup']);
+        $this->Auth->allow(['signup', 'login']);
     }
 
     public function beforeFilter(Event $event)
     {
-        if (in_array($this->request->action, ['signup'])) {
+        if (in_array($this->request->action, ['signup', 'login'])) {
             $this->response->header('Access-Control-Allow-Origin', '*');
         }
     }
@@ -134,5 +135,26 @@ class AppusersController extends AppController
         }
         $this->set(compact('saved'));
         $this->set('_serialize', ['saved']);
+    }
+
+    public function login()
+    {
+        $hasher = new DefaultPasswordHasher();
+        $loggedin = false;
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+            $user = $this->Appusers->find('all', [
+                'fields' => ['email', 'password'],
+                'conditions' => ['Appusers.email' => $data['email']],
+            ])->toArray();
+            if(count($user) > 0) {
+                $user = $user[0];
+                if($hasher->check($data['password'], $user['password'])) {
+                    $loggedin = true;
+                }
+            }
+        }
+        $this->set(compact('loggedin'));
+        $this->set('_serialize', ['loggedin']);
     }
 }
