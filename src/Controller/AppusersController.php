@@ -24,6 +24,7 @@ class AppusersController extends AppController
     {
         if (in_array($this->request->action, ['signup', 'login'])) {
             $this->response->header('Access-Control-Allow-Origin', '*');
+            $this->response->header('Access-Control-Allow-Headers', '*');
         }
     }
 
