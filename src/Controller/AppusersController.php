@@ -20,12 +20,12 @@ class AppusersController extends AppController
     public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['signup', 'login']);
+        $this->Auth->allow(['signup', 'login', 'getAccountData']);
     }
 
     public function beforeFilter(Event $event)
     {
-        if (in_array($this->request->action, ['signup', 'login'])) {
+        if (in_array($this->request->action, ['signup', 'login', 'getAccountData'])) {
             $this->response->header('Access-Control-Allow-Origin', Configure::read('APP_ORIGIN'));
             $this->response->header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
             $this->response->header('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
@@ -169,5 +169,14 @@ class AppusersController extends AppController
         $verificationCode =  $this->Cookie->read('Appuser.verificationCode');
         $this->set(compact('loggedin', 'verificationCode'));
         $this->set('_serialize', ['loggedin', 'verificationCode']);
+    }
+
+    public function getAccountData()
+    {
+        $id =  $this->Cookie->read('Appuser.verificationCode');
+        $appuser = $this->Appusers->get($id);
+
+        $this->set('appuser', $appuser);
+        $this->set('_serialize', ['appuser']);
     }
 }
